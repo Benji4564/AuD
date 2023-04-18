@@ -608,6 +608,7 @@ public class Management implements IManagement{
             } else {
                 right = mid - 1;
             }
+            
         }    
         return index;
     }
@@ -625,6 +626,8 @@ public class Management implements IManagement{
             }
             //management.printEmployee(management.getEmployees());
             System.out.println(c);
+
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
