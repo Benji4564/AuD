@@ -1,0 +1,23 @@
+package de.ostfalia.aud.s23ss.base;
+
+public enum Department {
+    SERVICE("Service"), 
+    DEVELOPMENT("Development"), 
+    SALES("Sales"), 
+    PRODUCTION("Production"), 
+    MANPOWER("Manpower"), 
+    RESEARCH("Research"), 
+    MARKETING("Marketing"), 
+    MANAGEMENT("Management"), 
+    FINANCE("Finance");
+    
+    private String name;
+    
+    private Department(String name) {
+        this.name = name;
+    }
+    
+    public String getName() {
+        return name;
+    }
+}

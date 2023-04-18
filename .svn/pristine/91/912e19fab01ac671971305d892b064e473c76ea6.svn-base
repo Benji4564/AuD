@@ -1,0 +1,59 @@
+package de.ostfalia.aud.s23ss.base;
+
+public enum Department {
+    /**
+     * Enum for the SERVICE department.
+     */
+    SERVICE("Service"), 
+    /**
+     * Enum for the DEVELOPMENT department.
+     */
+    DEVELOPMENT("Development"),
+    /**
+     * Enum for the SALES department.
+     */ 
+    SALES("Sales"), 
+    /**
+     * Enum for the PRODUCTION department.
+     */ 
+    PRODUCTION("Production"),
+    /**
+     * Enum for the MANPOWER department.
+     */  
+    MANPOWER("Manpower"), 
+    /**
+     * Enum for the RESEARCH department.
+     */  
+    RESEARCH("Research"), 
+    /**
+     * Enum for the MARKETING department.
+     */  
+    MARKETING("Marketing"), 
+    /**
+     * Enum for the MANAGEMENT department.
+     */  
+    MANAGEMENT("Management"), 
+    /**
+     * Enum for the FINANCE department.
+     */  
+    FINANCE("Finance");
+    
+    private String name;
+    
+    private Department(String name) {
+        this.name = name;
+    }
+    
+
+    public Department getDepartment() {
+        return this;
+    }
+    
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+
+}

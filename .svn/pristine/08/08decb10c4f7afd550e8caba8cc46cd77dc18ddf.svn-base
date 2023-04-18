@@ -1,0 +1,228 @@
+package de.ostfalia.aud.s23ss.a1;
+import de.ostfalia.aud.s23ss.base.Department;
+import de.ostfalia.aud.s23ss.base.IEmployee;
+import de.ostfalia.aud.s23ss.base.IManagement;
+import de.ostfalia.aud.s23ss.base.Employee;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
+
+
+public class Management implements IManagement{
+
+    private int numberOfOperations = 0; // Anzahl der ausgeführten Operationen
+    IEmployee[] employees = new IEmployee[8]; // Array mit den Datensätzen
+
+    public Management(String fileName) throws IOException {
+        String[] fileContent = Files.readAllLines(Paths.get(fileName)).toArray(new String[0]);
+        for (int i = 1; i < fileContent.length; i++) {
+            employees = addDataDynamic(employees, new Employee(fileContent[i]), i);
+        }
+       
+    }
+
+    /*
+    * Konstruktor für die Klasse Management.
+    */
+    public Management(){
+        System.err.println(employees.length);
+        numberOfOperations();        
+    }
+
+    /**
+        * Konstruktor für die Klasse Management.
+        * @param data - Array mit den Datensätzen: IEmployee[].
+        */
+    public Management(String[] data){
+        
+        for(int i = 0; i < data.length; i++){
+            employees = addDataDynamic(employees, new Employee(data[i]), i);
+        }
+    }
+
+    /**
+        * Fügt einen Datensatz in das Array ein.
+        * @param data - Array in das der Datensatz eingefügt werden soll: IEmployee[].
+        * @param newEmployee - neuer Datensatz: IEmployee.
+        * @param index - Index an dem der Datensatz eingefügt werden soll: int.
+        * @return - Array mit dem neuen Datensatz: IEmployee[].
+        */
+    private IEmployee[] addDataDynamic(IEmployee[] data, IEmployee newEmployee, int index){
+        // System.err.println(data.length + " " + index);
+        // if(index == data.length ){
+        //     IEmployee[] temp = data;
+        //     data = new IEmployee[temp.length * 2];
+        //     System.out.println(data.length);
+        //     for(int i = 0; i < data.length; i++){
+        //         data[i] = temp[i];
+        //     }
+
+        //     return data;
+
+
+        // } 
+
+        // data[index] = newEmployee;
+
+        // return data;
+        // data[index] = newEmployee;
+        // for(IEmployee e : data){
+        //     System.err.println(e);
+        // }
+
+
+        if(index == data.length) {
+            IEmployee[] temp = data;
+            data = new IEmployee[temp.length * 2];
+            for(int i = 0; i < temp.length; i++){
+                data[i] = temp[i];
+            }
+        }
+        System.out.println(this);
+        System.err.println(data.length + " " + index);
+        return data;
+        
+        
+    }
+
+    /**
+	 * Liefert die Anzahl der Datensätze.
+	 * @return Anzahl der Datensätze: int.
+	 */
+    @Override
+    public int size() {
+        return employees.length;
+    }
+
+    /**
+	 * Fügt einen Mitarbeiter hinzu.
+	 * @param member - hinzuzufügender Mitarbeiter: IEmployee.	
+	 */
+    @Override
+    public void insert(IEmployee member) {  
+        numberOfOperations = 0;      
+        if (member == null) {
+            throw new IllegalArgumentException("Member is null");
+        } else{
+            employees = addDataDynamic(employees, member, employees.length -1 );
+            numberOfOperations++;
+        } 
+    }
+
+    /**
+	 * Sucht nach einem Datensatz mit dem angegebenen Schlüssel.
+	 * @param key - Schlüsselwert: int 
+	 * @return - den gefundenen Datensatz, oder null, wenn der Schlüsselwert
+	 * nicht gefunden werden konnte: IEmployee.
+	 */
+    @Override
+    public IEmployee search(int key) {
+        numberOfOperations = 0;         
+        numberOfOperations++;           
+
+        return employees[key]; 
+    }
+
+    /**
+	 * Sucht nach Datensätzen mit dem angegebenen Namen und Vornamen.
+	 * @param name - Nachname : String.
+	 * @param firstName - Vorname : String. 
+	 * @return - die gefundenen Datensätze, oder ein leeres Array, wenn keine
+	 * passenden Mitarbeiter gefunden werden konnten: IEmployee[]. 
+	 */
+    @Override
+    public IEmployee[] search(String name, String firstName) {
+        numberOfOperations = 0;
+        if (name == null || firstName == null) {
+            throw new IllegalArgumentException("Name or firstName is null");
+        } else {
+            IEmployee[] employeesSearched = new IEmployee[10];
+            int index = 0;
+            for (int i = 0; i < this.employees.length; i++) {
+                if (this.employees[i].getName().equals(name) && this.employees[i].getFirstName().equals(firstName)) {
+                    employeesSearched = addDataDynamic(employeesSearched, this.employees[i], index);
+                    index++;
+                    numberOfOperations++;
+                }
+            }           
+            return employeesSearched;
+        }
+    }
+
+    /**
+	 * Liefert die Anzahl der Mitarbeiter der angegebenen Abteilung zurück.
+	 * @param department die gesuchte Abteilung: Department.
+	 * @return - Anzahl der Datensätze mit der angegebenen Abteilung: int.
+	 */
+    @Override
+    public int size(Department department) {
+        numberOfOperations = 0;
+        int count = 0;
+        for (int i = 0; i < employees.length; i++) {
+            if (employees[i].getDepartment().equals(department)) {
+                count++;
+                numberOfOperations++;
+            }
+        }        
+        return count;        
+    }
+
+    /**
+	 * Liefert die Datensaetze mit der angegebenen Abteilung zurück.
+	 * @param department die gesuchte Abteilung: Department.
+	 * @return - die Datensätze mit der der angegebenen Abteilung,
+	 * oder ein leeres Array, wenn keine Einträge gefunden wurden: IEmployee[].
+	 */
+    @Override
+    public IEmployee[] members(Department department) {
+        numberOfOperations = 0;
+        IEmployee[] employeesInDepartment = new IEmployee[8];
+        int index = 0;
+        for (int i = 0; i < this.employees.length; i++) {
+            if (this.employees[i].getDepartment().equals(department)) {
+                employeesInDepartment = addDataDynamic(employeesInDepartment, this.employees[i], index);
+                index++;
+                numberOfOperations++;
+            }
+        }        
+        return employeesInDepartment;
+    }
+
+    /**
+	 * Liefert alle Datensätze als Array von IEmployee zurück.
+	 * @return - alle Datensätze als Array: IEmployee[].
+	 */
+    @Override
+    public IEmployee[] toArray() {
+        IEmployee[] employeesDataAll = new IEmployee[8];
+        int index = 0;
+        for (int i = 0; i < this.employees.length; i++) {
+            employeesDataAll = addDataDynamic(employeesDataAll, this.employees[i], index);
+            index++;
+        }        
+        return employeesDataAll;
+    }
+
+    /**
+	 * Liefert die Anzahl grundlegenden Operationen bei der zuvor aufgerufenen
+	 * Zugriffsmethode zurück.
+	 * @return - Anzahl grundlegenden Operationen bei der zuvor aufgerufenen
+	 * Zugriffsmethode: int.
+	 */
+    @Override
+    public int numberOfOperations() {
+        return numberOfOperations;
+    }
+
+    public static void main(String[] args) {
+        try {
+            Management dummy = new Management("D:/github/AuD/AlgoDatSS23/src/de/ostfalia/aud/s23ss/a1/40k_employees.csv");
+        } catch (Exception e) {
+            System.out.println(e);
+            // TODO: handle exception
+        }
+        
+    }
+    
+}

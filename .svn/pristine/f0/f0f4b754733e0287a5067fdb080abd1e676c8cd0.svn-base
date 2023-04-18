@@ -1,0 +1,299 @@
+package de.ostfalia.aud.s23ss.a1;
+import de.ostfalia.aud.s23ss.base.Department;
+import de.ostfalia.aud.s23ss.base.IEmployee;
+import de.ostfalia.aud.s23ss.base.IManagement;
+import de.ostfalia.aud.s23ss.base.Employee;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageWriteParam;
+
+import java.io.IOException;
+
+
+public class Management implements IManagement{
+
+    private int numberOfOperations = 0; // Anzahl der ausgeführten Operationen
+    IEmployee[] employees = new IEmployee[8]; // Array mit den Datensätzen
+
+    public Management(String fileName) throws IOException {
+        numberOfOperations = 0;
+        int counter = 0;
+        String[] fileContent = Files.readAllLines(Paths.get(fileName)).toArray(new String[0]);
+        for (int i = 1; i < fileContent.length; i++) {
+            counter++;
+            insert(new Employee(fileContent[i]));
+        }
+
+        numberOfOperations = counter;
+       
+    }
+
+
+
+
+
+    /**
+     * Konstruktor für die Klasse Management.
+     */    
+    public Management(){
+        numberOfOperations = 0;
+        employees = new IEmployee[8];
+        for(int i = 0; i < employees.length; i++){
+            employees[i] = new Employee(null);
+        }  
+    }
+
+
+
+
+
+    /**
+     * Konstruktor für die Klasse Management.
+     * @param data - Array mit den Datensätzen: IEmployee[].
+     */
+    public Management(String[] data){
+        numberOfOperations = 0;
+        for(int i = 0; i < employees.length; i++){
+            employees[i] = new Employee(null);
+        }
+
+        for(int i = 0; i < data.length; i++){
+            insert(new Employee(data[i]));
+        }
+
+    }
+
+    /**
+     * Fügt einen Datensatz in das Array ein.
+     * @param data - Array in das der Datensatz eingefügt werden soll: IEmployee[].
+     * @param newEmployee - neuer Datensatz: IEmployee.
+     * @param index - Index an dem der Datensatz eingefügt werden soll: int.
+     * @return - Array mit dem neuen Datensatz: IEmployee[].
+     */
+    private IEmployee[] addDataDynamic(IEmployee[] data, IEmployee newEmployee, int index){
+        if(index == data.length) {
+            IEmployee[] temp = data.clone();
+            data = new IEmployee[temp.length * 2];
+            for(int i = 0; i < temp.length; i++){
+                data[i] = temp[i];
+            }
+        }
+
+        for(int i = 0; i < data.length; i++) {
+            if(data[i] == null) {
+                data[i] = new Employee(null);
+            }
+        }
+        data[index] = newEmployee;
+        return data;        
+    }
+
+    /**
+	 * Liefert die Anzahl der Datensätze.
+	 * @return Anzahl der Datensätze: int.
+	 */
+    @Override
+    public int size() {
+        numberOfOperations = 0;
+        return this.toArray().length;
+    }
+
+    /**
+	 * Fügt einen Mitarbeiter hinzu.
+	 * @param member - hinzuzufügender Mitarbeiter: IEmployee.	
+	 */
+    @Override
+    public void insert(IEmployee member) {  
+        numberOfOperations = 0;    
+        if (member == null) {
+            throw new IllegalArgumentException("Member is null");
+        } else{
+            
+            for(int i = 0; i < employees.length; i++){
+                
+                if(employees[i] == null || employees[i].toString().equals("KeinEintrag")){
+                    employees = addDataDynamic(employees, member, i);
+                    numberOfOperations++;
+                    return;
+                }
+            
+            }
+            //System.err.println(numberOfOperations);
+            //numberOfOperations++;
+            employees = addDataDynamic(employees, member, employees.length);
+        } 
+    }
+
+    /**
+	 * Sucht nach einem Datensatz mit dem angegebenen Schlüssel.
+	 * @param key - Schlüsselwert: int 
+	 * @return - den gefundenen Datensatz, oder null, wenn der Schlüsselwert
+	 * nicht gefunden werden konnte: IEmployee.
+	 */
+    @Override
+    public IEmployee search(int key) {
+        numberOfOperations = 0;
+        IEmployee[] temp = this.toArray();       
+        for (IEmployee e : temp) {
+            numberOfOperations++;
+            if (employees != null && !e.toString().equals("KeinEintrag") && e.getKey() == key) {
+                return e;
+            }  
+        }
+        return null;
+    }
+
+    /**
+	 * Sucht nach Datensätzen mit dem angegebenen Namen und Vornamen.
+	 * @param name - Nachname : String.
+	 * @param firstName - Vorname : String. 
+	 * @return - die gefundenen Datensätze, oder ein leeres Array, wenn keine
+	 * passenden Mitarbeiter gefunden werden konnten: IEmployee[]. 
+	 */
+    @Override
+    public IEmployee[] search(String name, String firstName) {
+        numberOfOperations = 0;
+        List<IEmployee> employeesSearched = new ArrayList<IEmployee>();
+        IEmployee[] temp = this.toArray();
+        for(int i = 0; i < temp.length; i++){
+            numberOfOperations++;
+            if(!temp[i].toString().equals("KeinEintrag") && temp[i].toString() != null && temp[i].getName().equals(name) && temp[i].getFirstName().equals(firstName)){
+                employeesSearched.add(temp[i]);
+                
+            }
+        }
+        return employeesSearched.toArray(new IEmployee[0]);
+    }
+
+    /**
+	 * Liefert die Anzahl der Mitarbeiter der angegebenen Abteilung zurück.
+	 * @param department die gesuchte Abteilung: Department.
+	 * @return - Anzahl der Datensätze mit der angegebenen Abteilung: int.
+	 */
+    @Override
+    public int size(Department department) {
+        numberOfOperations = 0;
+        int count = 0;
+        IEmployee[] locaEmployees = this.toArray();
+        for (int i = 0; i < locaEmployees.length; i++) {
+            numberOfOperations++;
+            if (employees[i].getDepartment() != null  && employees[i].getDepartment().equals(department)) {
+                count++;
+            }
+        }        
+        return count;        
+    }
+
+    /**
+	 * Liefert die Datensaetze mit der angegebenen Abteilung zurück.
+	 * @param department die gesuchte Abteilung: Department.
+	 * @return - die Datensätze mit der der angegebenen Abteilung,
+	 * oder ein leeres Array, wenn keine Einträge gefunden wurden: IEmployee[].
+	 */
+    @Override
+    public IEmployee[] members(Department department) {
+        numberOfOperations = 0;
+        IEmployee[] employeesInDepartment = new IEmployee[8];
+        int index = 0;
+        IEmployee[] temp = this.toArray();
+        for (int i = 0; i < temp.length; i++) {
+            numberOfOperations++;
+            if (temp[i].getDepartment() != null &&  temp[i].getDepartment().equals(department)) {
+                employeesInDepartment = addDataDynamic(employeesInDepartment, temp[i], index);
+                index++;
+                
+            }
+        }        
+        return createArray(employeesInDepartment);
+    }
+
+    /**
+	 * Liefert alle Datensätze als Array von IEmployee zurück.
+	 * @return - alle Datensätze als Array: IEmployee[].
+	 */
+    @Override
+    public IEmployee[] toArray() {
+        int c = 0;
+        for(IEmployee e : employees) {
+            if( e!=null && !e.toString().equals("KeinEintrag")){
+                c++;
+            }
+        }
+        IEmployee[] newEmployees = new IEmployee[c];
+        for(int i = 0; i < c; i++) {
+            newEmployees[i] = employees[i];
+        }
+            
+        return newEmployees;
+    }
+
+
+    /**
+	 * Liefert alle Datensätze als Array von IEmployee zurück.
+     * @param locaEmployees - Array von IEmployee
+	 * @return - alle Datensätze als Array: IEmployee[].
+	 */
+
+    private IEmployee[] createArray(IEmployee[] locaEmployees) {
+        int c = 0;
+        for(IEmployee e : locaEmployees) {
+            if(e!= null && !e.toString().equals("KeinEintrag")){
+                c++;
+            }
+        }
+        IEmployee[] newEmployees = new IEmployee[c];
+        for(int i = 0; i < c; i++) {
+            newEmployees[i] = locaEmployees[i];
+        }
+            
+        return newEmployees;
+    }
+
+    /**
+	 * Liefert die Anzahl grundlegenden Operationen bei der zuvor aufgerufenen
+	 * Zugriffsmethode zurück.
+	 * @return - Anzahl grundlegenden Operationen bei der zuvor aufgerufenen
+	 * Zugriffsmethode: int.
+	 */
+    @Override
+    public int numberOfOperations() {
+        return numberOfOperations;
+    }
+
+    /**
+     * Main Methode zum Auführen der Klasse Management.
+     * @param args - String Array.
+     */
+
+
+     private static String[] d = {
+        "10796;1959-06-30;Breannda;Billingsley;F;1990-11-08;Management",
+        // /*[0]*/ "10855;1957-08-07;Breannda;Billingsley;F;1991-08-05;Finance",
+        // /*[1]*/ "10041;1959-08-27;Uri;Lenart;F;1989-11-12;Sales",
+        // /*[2]*/ "10942;1952-08-08;Toshimitsu;Larfeldt;F;1989-09-08;Development",
+        // /*[3]*/ "10034;1962-12-29;Bader;Swan;M;1988-09-21;Sales",
+        // /*[4]*/ "10943;1955-11-19;Berna;Skafidas;M;1988-02-19;Development",
+        // /*[5]*/ "10938;1958-05-11;Shaowei;Iisaku;F;1985-09-24;Marketing",
+        // /*[6]*/ "10796;1959-06-30;Breannda;Billingsley;F;1990-11-08;Management",
+        // /*[7]*/ "10005;1955-01-21;Kyoichi;Maliniak;M;1989-09-12;Manpower",
+        // /*[8]*/ "10060;1961-10-15;Breannda;Billingsley;F;1987-11-02;Service",
+        // /*[9]*/ "10948;1952-12-23;Shigehito;Brodie;M;1996-09-30;Development",
+    };
+    public static void main(String[] args) {
+        try {
+            Management dummy = new Management(d);
+            for (int i = 0; i < dummy.toArray().length; i++) {
+                System.out.println(dummy.toArray()[i]);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            // TODO: handle exception
+        }
+        
+    }
+    
+}

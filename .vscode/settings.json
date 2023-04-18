@@ -1,0 +1,4 @@
+{
+    "java.checkstyle.configuration": "${workspaceFolder}\\AlgoDatSS23\\gdp_checks2_v10.1.xml",
+    "java.checkstyle.version": "10.9.2"
+}

@@ -1,0 +1,99 @@
+package de.ostfalia.aud.s23ss.a1;
+import de.ostfalia.aud.s23ss.base.Department;
+import de.ostfalia.aud.s23ss.base.IEmployee;
+import de.ostfalia.aud.s23ss.base.IManagement;
+import de.ostfalia.aud.s23ss.base.Employee;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
+
+
+public class Management implements IManagement{
+
+    IEmployee[] employees = new IEmployee[8];
+
+    public Management(String fileName) throws IOException {
+        String[] fileContent = Files.readAllLines(Paths.get(fileName)).toArray(new String[0]);
+        for (int i = 1; i < fileContent.length; i++) {
+            employees = addDataDynamic(employees, new Employee(fileContent[i]), i);
+
+        }
+       
+    }
+
+    public Management(String[] data){
+
+    }
+
+    private IEmployee[] addDataDynamic(IEmployee[] data, IEmployee newEmployee, int index){
+        if(index == data.length){
+            IEmployee[] temp = data;
+            data = new IEmployee[data.length * 2];
+            for(int i = 0; i < temp.length; i++){
+                data[i] = temp[i];
+            }
+        }
+
+        return data;
+
+    }
+
+    @Override
+    public int size() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'size'");
+    }
+
+    @Override
+    public void insert(IEmployee member) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'insert'");
+    }
+
+    @Override
+    public IEmployee search(int key) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    }
+
+    @Override
+    public IEmployee[] search(String name, String firstName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    }
+
+    @Override
+    public int size(Department department) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'size'");
+    }
+
+    @Override
+    public IEmployee[] members(Department department) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'members'");
+    }
+
+    @Override
+    public IEmployee[] toArray() {
+        return employees;
+    }
+
+    @Override
+    public int numberOfOperations() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'numberOfOperations'");
+    }
+
+    public static void main(String[] args) {
+        try {
+            Management dummy = new Management("D:/github/AuD/AlgoDatSS23/src/de/ostfalia/aud/s23ss/a1/40k_employees.csv");
+        } catch (Exception e) {
+            System.out.println(e);
+            // TODO: handle exception
+        }
+        
+    }
+    
+}

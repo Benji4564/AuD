@@ -1,0 +1,326 @@
+package de.ostfalia.aud.s23ss.a1;
+
+import de.ostfalia.aud.s23ss.base.Department;
+import de.ostfalia.aud.s23ss.base.IEmployee;
+import de.ostfalia.aud.s23ss.base.IManagement;
+import de.ostfalia.aud.s23ss.base.Employee;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
+
+
+public class Management implements IManagement{
+
+    private int numberOfOperations = 0; // Anzahl der ausgeführten Operationen
+    IEmployee[] employees = new IEmployee[8]; // Array mit den Datensätzen
+    private int numberNormalOperations = 0; // Anzahl der Grundoperationen
+    long timeUsed = 0; // Zeit die für die Operationen benötigt wurde
+    int pointer = 0; // Zeiger für das Array
+
+    public Management(String fileName) throws IOException {
+        numberOfOperations = 0;
+        numberNormalOperations = 0;
+        long startTime = System.nanoTime();
+        int counter = 0;
+        String[] fileContent = Files.readAllLines(Paths.get(fileName)).toArray(new String[0]);
+        for (int i = 1; i < fileContent.length; i++) {
+            counter++;
+            insert(new Employee(fileContent[i]));
+        }
+
+        numberOfOperations = counter;
+        long endTime = System.nanoTime();
+        System.err.println("The operation 'insert in constructor' took " + (endTime - startTime) + " ns.");
+    }
+
+    /**
+     * Konstruktor für die Klasse Management.
+     */    
+    public Management(){
+        numberOfOperations = 0;
+        employees = new IEmployee[8];
+        for(int i = 0; i < employees.length; i++){
+            employees[i] = new Employee(null);
+        }  
+    }
+
+
+
+
+
+    /**
+     * Konstruktor für die Klasse Management.
+     * @param data - Array mit den Datensätzen: IEmployee[].
+     */
+    public Management(String[] data){
+        numberOfOperations = 0;
+        for(int i = 0; i < employees.length; i++){
+            employees[i] = new Employee(null);
+        }
+
+        for(int i = 0; i < data.length; i++){
+            insert(new Employee(data[i]));
+        }
+
+    }
+
+    /**
+     * Fügt einen Datensatz in das Array ein.
+     * @param data - Array in das der Datensatz eingefügt werden soll: IEmployee[].
+     * @param newEmployee - neuer Datensatz: IEmployee.
+     * @param index - Index an dem der Datensatz eingefügt werden soll: int.
+     * @return - Array mit dem neuen Datensatz: IEmployee[].
+     */
+    private IEmployee[] addDataDynamic(IEmployee[] data, IEmployee newEmployee, int index){
+        numberNormalOperations++;
+        // System.err.println(index==data.length);
+        if(index == data.length) {
+            IEmployee[] temp = data.clone();
+            data = new IEmployee[temp.length * 2];
+            for(int i = 0; i < temp.length; i++){
+                
+                data[i] = temp[i];
+            }
+        }
+
+        for(int i = 0; i < data.length; i++) {
+            numberNormalOperations++;
+            // if(data[i] == null) {
+            //     data[i] = new Employee(null);
+            // }
+        }
+        data[index] = newEmployee;
+        return data;        
+    }
+
+    /**
+	 * Liefert die Anzahl der Datensätze.
+	 * @return Anzahl der Datensätze: int.
+	 */
+    @Override
+    public int size() {
+        numberOfOperations = 0;
+        return this.toArray().length;
+    }
+
+    /**
+	 * Fügt einen Mitarbeiter hinzu.
+	 * @param member - hinzuzufügender Mitarbeiter: IEmployee.	
+	 */
+    @Override
+    public void insert(IEmployee member) {  
+        // long startTime = System.nanoTime();
+        numberOfOperations = 0;  
+        numberNormalOperations++;  
+        if (member == null) {
+            throw new IllegalArgumentException("Member is null");
+        } else{
+            // addDataDynamic(employees, member, pointer);
+            employees = addDataDynamic(employees, member, pointer);
+            pointer++;
+            numberOfOperations++;
+
+
+        } 
+    }
+
+    /**
+	 * Sucht nach einem Datensatz mit dem angegebenen Schlüssel.
+	 * @param key - Schlüsselwert: int 
+	 * @return - den gefundenen Datensatz, oder null, wenn der Schlüsselwert
+	 * nicht gefunden werden konnte: IEmployee.
+	 */
+    @Override
+    public IEmployee search(int key) {
+        long startTime = System.nanoTime();
+        numberOfOperations = 0;
+             
+        for(int i = 0; i < employees.length; i++){
+            if(employees[i] != null && !employees[i].toString().equals( "KeinEintrag")){
+                numberOfOperations++;
+                if( employees[i].getKey() == key){
+                    return employees[i];
+                }
+            }
+
+        }
+
+        long endTime = System.nanoTime();
+        System.err.println("The operation 'search by key' took " + (endTime - startTime) + " ns.");
+        return null;
+    }
+
+    /**
+	 * Sucht nach Datensätzen mit dem angegebenen Namen und Vornamen.
+	 * @param name - Nachname : String.
+	 * @param firstName - Vorname : String. 
+	 * @return - die gefundenen Datensätze, oder ein leeres Array, wenn keine
+	 * passenden Mitarbeiter gefunden werden konnten: IEmployee[]. 
+	 */
+    @Override
+    public IEmployee[] search(String name, String firstName) {
+        numberNormalOperations = 0;
+        long startTime = System.nanoTime();
+        numberOfOperations = 0;
+        IEmployee[] foundEmployee = new IEmployee[employees.length];
+        IEmployee[] temp = this.toArray();
+        int counter = 0;
+        for(int i = 0; i < temp.length; i++){
+            numberOfOperations++;
+            numberNormalOperations++;
+            if(!temp[i].toString().equals("KeinEintrag") && temp[i].toString() != null ){
+                if(temp[i].getName().equals(name) && temp[i].getFirstName().equals(firstName)) {
+                    numberNormalOperations++;
+                    foundEmployee[counter] = temp[i];
+                    counter++;
+                }   
+            }
+        }
+        long endTime = System.nanoTime();
+        System.err.println("The operation 'search by name' took " + (endTime - startTime) + " ns.");
+        return createArray(foundEmployee);
+    }
+
+    /**
+	 * Liefert die Anzahl der Mitarbeiter der angegebenen Abteilung zurück.
+	 * @param department die gesuchte Abteilung: Department.
+	 * @return - Anzahl der Datensätze mit der angegebenen Abteilung: int.
+	 */
+    @Override
+    public int size(Department department) {
+        numberOfOperations = 0;
+        int count = 0;
+        IEmployee[] locaEmployees = this.toArray();
+        for (int i = 0; i < locaEmployees.length; i++) {
+            numberOfOperations++;
+            if (employees[i].getDepartment() != null  && employees[i].getDepartment().equals(department)) {
+                count++;
+            }
+        }        
+        return count;        
+    }
+
+    /**
+	 * Liefert die Datensaetze mit der angegebenen Abteilung zurück.
+	 * @param department die gesuchte Abteilung: Department.
+	 * @return - die Datensätze mit der der angegebenen Abteilung,
+	 * oder ein leeres Array, wenn keine Einträge gefunden wurden: IEmployee[].
+	 */
+    @Override
+    public IEmployee[] members(Department department) {
+        timeUsed = 0;
+        long start = System.nanoTime();
+        numberOfOperations = 0;
+        IEmployee[] employeesInDepartment = new IEmployee[8];
+        int index = 0;
+        IEmployee[] temp = this.toArray();
+        for (int i = 0; i < temp.length; i++) {
+            numberOfOperations++;
+            if (temp[i].getDepartment() != null &&  temp[i].getDepartment().equals(department)) {
+                employeesInDepartment = addDataDynamic(employeesInDepartment, temp[i], index);
+                index++;
+                
+            }
+        }
+        long end = System.nanoTime();
+        timeUsed = end - start;
+        System.err.println("The operation 'Member' took " + (end - start) + " ns");   
+        return createArray(employeesInDepartment);
+    }
+    /**
+	 * Liefert die Zeit die für die Operationen benötigt wurde.
+	 * @return - Zeit.
+	 */
+    public long getTimeUsed() {
+        return timeUsed;
+    }
+
+    /**
+	 * Liefert alle Datensätze als Array von IEmployee zurück.
+	 * @return - alle Datensätze als Array: IEmployee[].
+	 */
+    @Override
+    public IEmployee[] toArray() {
+        int c = 0;
+        for(IEmployee e : employees) {
+            if( e!=null && !e.toString().equals("KeinEintrag")){
+                c++;
+            }
+        }
+        IEmployee[] newEmployees = new IEmployee[c];
+        for(int i = 0; i < c; i++) {
+            newEmployees[i] = employees[i];
+        }
+            
+        return newEmployees;
+    }
+
+
+    /**
+	 * Liefert alle Datensätze als Array von IEmployee zurück.
+     * @param locaEmployees - Array von IEmployee
+	 * @return - alle Datensätze als Array: IEmployee[].
+	 */
+
+    private IEmployee[] createArray(IEmployee[] locaEmployees) {
+        int c = 0;
+        for(IEmployee e : locaEmployees) {
+            if(e!= null && !e.toString().equals("KeinEintrag")){
+                c++;
+            }
+        }
+        IEmployee[] newEmployees = new IEmployee[c];
+        for(int i = 0; i < c; i++) {
+            newEmployees[i] = locaEmployees[i];
+        } 
+        return newEmployees;
+    }
+
+    /**
+	 * Liefert die Anzahl grundlegenden Operationen bei der zuvor aufgerufenen
+	 * Zugriffsmethode zurück.
+	 * @return numberOfOperations - Anzahl grundlegenden Operationen bei der zuvor aufgerufenen
+	 * Zugriffsmethode: int.
+	 */
+    @Override
+    public int numberOfOperations() {
+        return numberOfOperations;
+    }
+
+    /**
+	 * Liefert die Anzahl Operationen bei der zuvor aufgerufenen
+	 * Zugriffsmethode zurück.
+	 * @return - Anzahl Operationen bei der zuvor aufgerufenen
+	 * Zugriffsmethode: int.
+	 */
+
+    public int getNumberOfNormalOperations() {
+        return numberNormalOperations;
+    }
+
+
+    /**
+     * Main Methode zum Auführen der Klasse Management.
+     * @param args - String Array.
+     * @throws InterruptedException
+     */
+
+    public static void main(String[] args) throws InterruptedException {
+        String fileName = "AlgoDatSS23/Materialien/40k_employees.csv";
+        try {
+            Management management = new Management(fileName);
+            long time = 0;
+            for(Department d: Department.values()) {
+                management.members(d);
+                time += management.getTimeUsed();
+            }
+
+            System.err.println("The operation 'Member lalala' took " + time/9 + " ns");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+    
+}

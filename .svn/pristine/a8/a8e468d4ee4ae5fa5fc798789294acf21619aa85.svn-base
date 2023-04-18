@@ -1,0 +1,60 @@
+package de.ostfalia.aud.s23ss.base;
+
+import java.time.LocalDate;
+
+public class Employee implements IEmployee {
+    private String[] informationArray;
+    private String information;
+
+
+    public Employee(String information) {
+        this.information = information;
+        this.informationArray = information.split(";");
+    }
+
+    public String toString() {
+        return information;
+    }
+
+    @Override
+    public int compareTo(IEmployee arg0) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'compareTo'");
+    }
+
+    @Override
+    public int getKey() {
+        return Integer.parseInt(informationArray[0]);
+    }
+
+    @Override
+    public String getName() {
+        return informationArray[3];
+    }
+
+    @Override
+    public String getFirstName() {
+        return informationArray[2];
+    }
+
+    @Override
+    public Gender getGender() {
+        return Gender.valueOf(informationArray[4]);
+    }
+
+    @Override
+    public LocalDate getBirthdate() {
+        return LocalDate.parse(informationArray[1]);
+    }
+
+    @Override
+    public LocalDate getHiredate() {
+        return LocalDate.parse(informationArray[5]);
+    }
+
+    @Override
+    public Department getDepartment() {
+        return Department.valueOf(informationArray[6]);
+    }
+    
+}
