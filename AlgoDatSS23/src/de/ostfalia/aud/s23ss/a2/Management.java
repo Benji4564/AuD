@@ -608,7 +608,6 @@ public class Management implements IManagement{
             } else {
                 right = mid - 1;
             }
-            
         }    
         return index;
     }
